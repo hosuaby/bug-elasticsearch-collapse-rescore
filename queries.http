@@ -15,3 +15,95 @@ Content-Type: application/json
     "field": "nom_arrondissement_communes"
   }
 }
+
+###
+# Collapse stations by locality (with inner hits)
+GET http://localhost:9200/velib/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match_all": {}
+  },
+  "collapse": {
+    "field": "nom_arrondissement_communes",
+    "inner_hits": {
+      "name": "by capacity",
+      "size": 5,
+      "sort": [
+        {
+          "capacity": "desc"
+        }
+      ]
+    },
+    "max_concurrent_group_searches": 4
+  }
+}
+
+###
+# Search for names containing "sur" and rescores by query on name containing "mairie"
+GET http://localhost:9200/velib/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match": {
+      "name": "sur"
+    }
+  },
+  "rescore": {
+    "window_size": 50,
+    "query": {
+      "rescore_query": {
+        "match_phrase": {
+          "name": {
+            "query": "mairie",
+            "slop": 2
+          }
+        }
+      },
+      "query_weight": 0.7,
+      "rescore_query_weight": 1.2
+    }
+  }
+}
+
+###
+# Collapse + rescore
+GET http://localhost:9200/velib/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match": {
+      "name": "sur"
+    }
+  },
+  "collapse": {
+    "field": "nom_arrondissement_communes",
+    "inner_hits": {
+      "name": "by capacity",
+      "size": 5,
+      "sort": [
+        {
+          "capacity": "desc"
+        }
+      ]
+    }
+  },
+  "rescore": {
+    "window_size": 50,
+    "query": {
+      "rescore_query": {
+        "match_phrase": {
+          "name": {
+            "query": "mairie",
+            "slop": 2
+          }
+        }
+      },
+      "query_weight": 0.7,
+      "rescore_query_weight": 1.2
+    }
+  }
+}
