@@ -1,0 +1,52 @@
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 1
+  },
+  "mappings": {
+    "_doc": {
+      "dynamic": "strict",
+      "properties": {
+        "ebike": {
+          "type": "integer"
+        },
+        "capacity": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "text"
+        },
+        "nom_arrondissement_communes": {
+          "type": "keyword"
+        },
+        "numbikesavailable": {
+          "type": "integer"
+        },
+        "is_installed": {
+          "type": "boolean"
+        },
+        "is_renting": {
+          "type": "boolean"
+        },
+        "mechanical": {
+          "type": "integer"
+        },
+        "stationcode": {
+          "type": "keyword"
+        },
+        "coordonnees_geo": {
+          "type": "geo_point"
+        },
+        "numdocksavailable": {
+          "type": "integer"
+        },
+        "duedate": {
+          "type": "date"
+        },
+        "is_returning": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
