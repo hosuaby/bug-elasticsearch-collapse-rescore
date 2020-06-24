@@ -1,0 +1,17 @@
+###
+# Get all from velib
+GET http://localhost:9200/velib/_search
+
+###
+# Collapse stations by locality
+GET http://localhost:9200/velib/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match_all": {}
+  },
+  "collapse": {
+    "field": "nom_arrondissement_communes"
+  }
+}
