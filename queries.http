@@ -8,12 +8,14 @@ GET http://localhost:9200/velib/_search
 Content-Type: application/json
 
 {
-  "query": {
-    "match_all": {}
-  },
-  "collapse": {
-    "field": "nom_arrondissement_communes"
-  }
+    "query": {
+        "match": {
+            "name": "sur"
+        }
+    },
+    "collapse": {
+        "field": "nom_arrondissement_communes"
+    }
 }
 
 ###
@@ -22,22 +24,24 @@ GET http://localhost:9200/velib/_search
 Content-Type: application/json
 
 {
-  "query": {
-    "match_all": {}
-  },
-  "collapse": {
-    "field": "nom_arrondissement_communes",
-    "inner_hits": {
-      "name": "by capacity",
-      "size": 5,
-      "sort": [
-        {
-          "capacity": "desc"
+    "query": {
+        "match": {
+            "name": "sur"
         }
-      ]
     },
-    "max_concurrent_group_searches": 4
-  }
+    "collapse": {
+        "field": "nom_arrondissement_communes",
+        "inner_hits": {
+            "name": "by capacity",
+            "size": 5,
+            "sort": [
+                {
+                    "capacity": "desc"
+                }
+            ]
+        },
+        "max_concurrent_group_searches": 4
+    }
 }
 
 ###
@@ -46,26 +50,68 @@ GET http://localhost:9200/velib/_search
 Content-Type: application/json
 
 {
-  "query": {
-    "match": {
-      "name": "sur"
-    }
-  },
-  "rescore": {
-    "window_size": 50,
     "query": {
-      "rescore_query": {
-        "match_phrase": {
-          "name": {
-            "query": "mairie",
-            "slop": 2
-          }
+        "match": {
+            "name": "sur"
         }
-      },
-      "query_weight": 0.7,
-      "rescore_query_weight": 1.2
+    },
+    "rescore": {
+        "window_size": 50,
+        "query": {
+            "rescore_query": {
+                "match_phrase": {
+                    "name": {
+                        "query": "mairie",
+                        "slop": 2
+                    }
+                }
+            },
+            "query_weight": 0.7,
+            "rescore_query_weight": 1.2
+        }
     }
-  }
+}
+
+###
+# Collapse + post rescore
+GET http://localhost:9200/velib/_search
+Content-Type: application/json
+
+{
+    "query": {
+        "match": {
+            "name": "sur"
+        }
+    },
+    "collapse": {
+        "field": "nom_arrondissement_communes",
+        "inner_hits": {
+            "name": "by capacity",
+            "size": 5,
+            "sort": [
+                {
+                    "capacity": "desc"
+                }
+            ]
+        }
+    },
+    "ext": {
+        "post-rescore": {
+            "window_size": 50,
+            "query": {
+                "rescore_query": {
+                    "match_phrase": {
+                        "name": {
+                            "query": "mairie",
+                            "slop": 2
+                        }
+                    }
+                },
+                "query_weight": 0.7,
+                "rescore_query_weight": 1.2
+            }
+        }
+    }
 }
 
 ###
@@ -74,36 +120,36 @@ GET http://localhost:9200/velib/_search
 Content-Type: application/json
 
 {
-  "query": {
-    "match": {
-      "name": "sur"
-    }
-  },
-  "collapse": {
-    "field": "nom_arrondissement_communes",
-    "inner_hits": {
-      "name": "by capacity",
-      "size": 5,
-      "sort": [
-        {
-          "capacity": "desc"
-        }
-      ]
-    }
-  },
-  "rescore": {
-    "window_size": 50,
     "query": {
-      "rescore_query": {
-        "match_phrase": {
-          "name": {
-            "query": "mairie",
-            "slop": 2
-          }
+        "match": {
+            "name": "sur"
         }
-      },
-      "query_weight": 0.7,
-      "rescore_query_weight": 1.2
+    },
+    "collapse": {
+        "field": "nom_arrondissement_communes",
+        "inner_hits": {
+            "name": "by capacity",
+            "size": 5,
+            "sort": [
+                {
+                    "capacity": "desc"
+                }
+            ]
+        }
+    },
+    "rescore": {
+        "window_size": 50,
+        "query": {
+            "rescore_query": {
+                "match_phrase": {
+                    "name": {
+                        "query": "mairie",
+                        "slop": 2
+                    }
+                }
+            },
+            "query_weight": 0.7,
+            "rescore_query_weight": 1.2
+        }
     }
-  }
 }
