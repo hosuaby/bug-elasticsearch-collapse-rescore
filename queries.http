@@ -115,6 +115,48 @@ Content-Type: application/json
 }
 
 ###
+# Collapse + LTR
+GET http://localhost:9200/velib/_search
+Content-Type: application/json
+
+{
+    "query": {
+        "match": {
+            "name": "sur"
+        }
+    },
+    "collapse": {
+        "field": "nom_arrondissement_communes",
+        "inner_hits": {
+            "name": "by capacity",
+            "size": 5,
+            "sort": [
+                {
+                    "capacity": "desc"
+                }
+            ]
+        }
+    },
+    "ext": {
+        "post-rescore": {
+            "window_size": 50,
+            "query": {
+                "rescore_query": {
+                    "sltr": {
+                        "params": {
+                            "keywords": "mairie"
+                        },
+                        "model": "linear_model"
+                    }
+                },
+                "query_weight": 0.7,
+                "rescore_query_weight": 1.2
+            }
+        }
+    }
+}
+
+###
 # Collapse + rescore
 GET http://localhost:9200/velib/_search
 Content-Type: application/json

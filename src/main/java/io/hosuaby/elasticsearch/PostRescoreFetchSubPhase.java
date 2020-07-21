@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.search.TopDocs;
+import org.elasticsearch.index.query.QueryShardContext;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.fetch.FetchSubPhase;
 import org.elasticsearch.search.internal.SearchContext;
@@ -31,7 +32,8 @@ public class PostRescoreFetchSubPhase implements FetchSubPhase {
         topDocs = QueryRescorer.INSTANCE.rescore(
                 topDocs,
                 context.searcher(),
-                postRescore.getRescorer().buildContext(context.getQueryShardContext()));
+                postRescore.getRescorer().buildContext(
+                        new QueryShardContext(context.getQueryShardContext())));
         context.queryResult().topDocs(topDocs, context.queryResult().sortValueFormats());
 
         for (int i = 0; i < hits.length; i++) {
