@@ -1,0 +1,111 @@
+version: '3.8'
+services:
+    es-master-1:
+        build: .
+        container_name: master1
+        environment:
+            - cluster.name=hosuaby
+            - bootstrap.memory_lock=true
+            - node.master=true
+            - node.data=false
+            - discovery.zen.ping.unicast.hosts=master2,master3
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - master-data-1:/usr/share/elasticsearch/data
+        ports:
+            - 9200:9200
+
+    es-master-2:
+        build: .
+        container_name: master2
+        environment:
+            - cluster.name=hosuaby
+            - bootstrap.memory_lock=true
+            - node.master=true
+            - node.data=false
+            - discovery.zen.ping.unicast.hosts=master1,master3
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - master-data-2:/usr/share/elasticsearch/data
+        ports:
+            - 9202:9200
+
+    es-master-3:
+        build: .
+        container_name: master3
+        environment:
+            - cluster.name=hosuaby
+            - bootstrap.memory_lock=true
+            - node.master=true
+            - node.data=false
+            - discovery.zen.ping.unicast.hosts=master1,master2
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - master-data-3:/usr/share/elasticsearch/data
+        ports:
+            - 9203:9200
+
+    es-data-1:
+        build: .
+        container_name: data1
+        environment:
+            - cluster.name=hosuaby
+            - bootstrap.memory_lock=true
+            - node.master=false
+            - node.data=true
+            - discovery.zen.ping.unicast.hosts=master1,master2,master3
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - es-data1:/usr/share/elasticsearch/data
+
+    es-data-2:
+        build: .
+        container_name: data2
+        environment:
+            - cluster.name=hosuaby
+            - bootstrap.memory_lock=true
+            - node.master=false
+            - node.data=true
+            - discovery.zen.ping.unicast.hosts=master1,master2,master3
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - es-data2:/usr/share/elasticsearch/data
+
+    kibana:
+        image: docker.elastic.co/kibana/kibana:6.5.4
+        container_name: kibana
+        environment:
+            SERVER_NAME: kibana.local
+            ELASTICSEARCH_URL: http://master1:9200
+        ports:
+            - 5601:5601
+
+volumes:
+    master-data-1:
+        driver: local
+    master-data-2:
+        driver: local
+    master-data-3:
+        driver: local
+    es-data1:
+        driver: local
+    es-data2:
+        driver: local
