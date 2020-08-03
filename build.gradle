@@ -41,7 +41,7 @@ tasks.register("unitTests", Test) {
 esplugin {
     name 'post-rescore-plugin'
     description 'Plugin that provides function postRescore that executes rescore on coordinating node'
-    classname 'io.hosuaby.elasticsearch.PostRescorePlugin'
+    classname 'io.hosuaby.elasticsearch.FinalRescorePlugin'
 }
 
 forbiddenApisMain.enabled = false

@@ -11,19 +11,20 @@ import org.elasticsearch.search.SearchExtBuilder;
 import org.elasticsearch.search.rescore.QueryRescorerBuilder;
 import org.elasticsearch.search.rescore.RescorerBuilder;
 
-public class PostRescoreExtBuilder extends SearchExtBuilder {
-    private QueryRescorerBuilder rescorer;
+public class FinalRescoreExtBuilder extends SearchExtBuilder {
+    public static final String FINAL_RESCORE_EXT = "final-rescore";
 
-    public PostRescoreExtBuilder(StreamInput in) {
+    private final QueryRescorerBuilder rescorer;
+
+    public FinalRescoreExtBuilder(StreamInput in) {
         try {
-            // TODO: find a way to instanciate any rescorer implementation, not only QueryRescorerBuilder
             this.rescorer = new QueryRescorerBuilder(in);
         } catch (IOException ioException) {
             throw new RuntimeException(ioException);
         }
     }
 
-    private PostRescoreExtBuilder(QueryRescorerBuilder rescorer) {
+    public FinalRescoreExtBuilder(QueryRescorerBuilder rescorer) {
         this.rescorer = rescorer;
     }
 
@@ -31,24 +32,26 @@ public class PostRescoreExtBuilder extends SearchExtBuilder {
         return rescorer;
     }
 
-    public static PostRescoreExtBuilder parseFromXContent(XContentParser parser) throws IOException {
+    public static FinalRescoreExtBuilder parseFromXContent(XContentParser parser) throws IOException {
         QueryRescorerBuilder rescorer = (QueryRescorerBuilder) RescorerBuilder.parseFromXContent(parser);
-        return new PostRescoreExtBuilder(rescorer);
+        return new FinalRescoreExtBuilder(rescorer);
     }
 
     @Override
     public String getWriteableName() {
-        return "post-rescore";
+        return FINAL_RESCORE_EXT;
     }
 
     @Override
     public void writeTo(StreamOutput out) throws IOException {
-        rescorer.writeTo(out);
+        out.writeNamedWriteable(this);
     }
 
     @Override
     public XContentBuilder toXContent(XContentBuilder builder, Params params) throws IOException {
-        return rescorer.toXContent(builder, params);
+        builder.startObject(FINAL_RESCORE_EXT);
+        rescorer.doXContent(builder, params);
+        return builder.endObject();
     }
 
     @Override
@@ -61,7 +64,7 @@ public class PostRescoreExtBuilder extends SearchExtBuilder {
             return false;
         }
 
-        PostRescoreExtBuilder another = (PostRescoreExtBuilder) other;
+        FinalRescoreExtBuilder another = (FinalRescoreExtBuilder) other;
         return Objects.equals(rescorer, another.rescorer);
     }
 

@@ -96,7 +96,7 @@ Content-Type: application/json
         }
     },
     "ext": {
-        "post-rescore": {
+        "final-rescore": {
             "window_size": 50,
             "query": {
                 "rescore_query": {
@@ -138,7 +138,7 @@ Content-Type: application/json
         }
     },
     "ext": {
-        "post-rescore": {
+        "final-rescore": {
             "window_size": 50,
             "query": {
                 "rescore_query": {
